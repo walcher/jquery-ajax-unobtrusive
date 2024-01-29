@@ -22,18 +22,6 @@
         data_target = "unobtrusiveAjaxClickTarget",
         data_validation = "unobtrusiveValidation";
 
-    function getFunction(code, argNames) {
-        var fn = window, parts = (code || "").split(".");
-        while (fn && parts.length) {
-            fn = fn[parts.shift()];
-        }
-        if (typeof (fn) === "function") {
-            return fn;
-        }
-        argNames.push(code);
-        return Function.constructor.apply(null, argNames);
-    }
-
     function isMethodProxySafe(method) {
         return method === "GET" || method === "POST";
     }
@@ -90,7 +78,7 @@
             beforeSend: function (xhr) {
                 var result;
                 asyncOnBeforeSend(xhr, method);
-                result = getFunction(element.getAttribute("data-ajax-begin"), ["xhr"]).apply(element, arguments);
+                result = $(element).trigger('ajax-begin', arguments)
                 if (result !== false) {
                     loading.show(duration);
                 }
@@ -98,11 +86,12 @@
             },
             complete: function () {
                 loading.hide(duration);
-                getFunction(element.getAttribute("data-ajax-complete"), ["xhr", "status"]).apply(element, arguments);
+                $(element).trigger('ajax-completed', arguments)
+                
             },
             success: function (data, status, xhr) {
                 asyncOnSuccess(element, data, xhr.getResponseHeader("Content-Type") || "text/html");
-                getFunction(element.getAttribute("data-ajax-success"), ["data", "status", "xhr"]).apply(element, arguments);
+                $(element).trigger('ajax-success', arguments)
             },
             error: function () {
                 getFunction(element.getAttribute("data-ajax-failure"), ["xhr", "status", "error"]).apply(element, arguments);
