@@ -94,7 +94,7 @@
                 $(element).trigger('ajax-success', arguments)
             },
             error: function () {
-                getFunction(element.getAttribute("data-ajax-failure"), ["xhr", "status", "error"]).apply(element, arguments);
+                $(element).trigger('ajax-failure', arguments)
             }
         });
 
